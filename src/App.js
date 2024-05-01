@@ -1,14 +1,29 @@
-function App() {
-  const signIn = async () => {
-    console.log('Sign In')
-  }
-
-  return (
-    <div className='text-center w-screen h-screen flex justify-center items-center'>
-      Hello World
-      <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={signIn}>Sign In</button>
-    </div>
-  );
+function navigate(url) {
+  window.location.href = url;
 }
 
-export default App;
+async function auth() {
+  const response = await fetch('http://127.0.0.1:3000/request', { method: 'post' });
+
+  const data = await response.json();
+  console.log(data);
+  navigate(data.url);
+
+}
+
+
+function App() {
+
+
+  return (
+    <>
+      <h1>Welcome to Consulting Ninja!</h1>
+      <h3>Google OAuth!</h3>
+
+      <button className="btn-auth" type="button" onClick={() => auth()}>Sign In
+      </button>
+    </>
+  )
+}
+
+export default App
