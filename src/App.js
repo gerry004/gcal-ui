@@ -7,8 +7,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} /> {/* Properly instantiate the component */}
-        <Route path="/dashboard" element={<Dashboard />} /> {/* Corrected path to match 'about' */}
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
