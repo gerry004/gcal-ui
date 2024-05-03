@@ -1,29 +1,17 @@
-function navigate(url) {
-  window.location.href = url;
-}
-
-async function auth() {
-  const response = await fetch('http://127.0.0.1:3000/request', { method: 'post' });
-
-  const data = await response.json();
-  console.log(data);
-  navigate(data.url);
-
-}
-
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './views/Home';
+import Dashboard from './views/Dashboard';
 
 function App() {
-
-
   return (
-    <>
-      <h1>Welcome to Consulting Ninja!</h1>
-      <h3>Google OAuth!</h3>
-
-      <button className="btn-auth" type="button" onClick={() => auth()}>Sign In
-      </button>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} /> {/* Properly instantiate the component */}
+        <Route path="/dashboard" element={<Dashboard />} /> {/* Corrected path to match 'about' */}
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
