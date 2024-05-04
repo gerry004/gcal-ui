@@ -3,14 +3,16 @@ import { useState, useEffect, useMemo } from 'react';
 import Colors from '../components/Colors';
 import Calendars from '../components/Calendars';
 import Legend from '../components/Legend';
-import { FaArrowLeft } from 'react-icons/fa';
-import { FaArrowRight } from 'react-icons/fa';
-import { transformEventsToTimeSpentObject } from '../utils/events';
+import Timeframe from '../components/Timeframe';
+import DatePicker from '../components/DatePicker';
 
 const Dashboard = () => {
   const [colors, setColors] = useState({})
   const [calendars, setCalendars] = useState([])
   const [events, setEvents] = useState([])
+  const [timeframe, setTimeframe] = useState('Week');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const getColors = async () => {
     try {
@@ -70,13 +72,6 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const timeSpentByColor = useMemo(() => {
-    if (events) {
-      return transformEventsToTimeSpentObject(events);
-    }
-    return {};
-  }, [events]);
-
   const updateCalendars = (calendarId, property, value) => {
     const updatedCalendars = calendars.map(cal => {
       if (cal.id === calendarId) {
@@ -89,20 +84,20 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className='flex m-1 rounded-full items-center'>
-        <FaArrowLeft />
-        <button className='p-2 bg-gray-100 hover:bg-gray-200 border-gray-600 border rounded-l-lg'>Day</button>
-        <button className='p-2 bg-gray-100 hover:bg-gray-200 border-gray-600 border'>Week</button>
-        <button className='p-2 bg-gray-100 hover:bg-gray-200 border-gray-600 border rounded-r-lg'>Month</button>
-        <FaArrowRight />
+      <div className='flex justify-between items-center p-2 m-2'>
+        <div className='flex gap-2'>
+          <DatePicker id='start-date' label='Start Date' date={startDate} setDate={setStartDate} />
+          <DatePicker id='end-date' label='End Date' date={endDate} setDate={setEndDate} />
+        </div>
+        <div className='flex m-1 rounded-full items-center'>
+          <Timeframe timeframe={timeframe} setTimeframe={setTimeframe} />
+        </div>
       </div>
-      <div className='flex gap-2'>
-        <input type='date' />
-        <input type='date' />
+      <div className='flex'>
+        {calendars && (<Calendars calendars={calendars} updateCalendars={updateCalendars} />)}
+        {events && (<Legend events={events} colors={colors} />)}
       </div>
       {colors && (<Colors className='flex gap-2' colors={colors} />)}
-      {calendars && (<Calendars className='flex flex-col' calendars={calendars} updateCalendars={updateCalendars} />)}
-      {timeSpentByColor && (<Legend data={timeSpentByColor} colors={colors} />)}
     </>
   );
 };

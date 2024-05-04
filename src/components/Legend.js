@@ -3,18 +3,29 @@
 //   ...
 // }
 
-const Legend = ({ data, colors }) => {
+import { useMemo } from "react";
+import { transformEventsToTimeSpentObject } from "../utils/events";
+
+const Legend = ({ events, colors }) => {
+
+  const timeSpentByColor = useMemo(() => {
+    if (events) {
+      return transformEventsToTimeSpentObject(events);
+    }
+    return {};
+  }, [events]);
+
   return (
-    <div>
-      {Object.keys(data).map((colorId) => {
-        const { hours, minutes } = data[colorId];
+    <div className='border rounded-lg inline-flex border-black flex-col p-2'>
+      {Object.keys(timeSpentByColor).map((colorId) => {
+        const { hours, minutes } = timeSpentByColor[colorId];
         return (
-          <div className='flex gap-2' key={colorId}>
+          <div className='flex items-center gap-2' key={colorId}>
             <span
-              className='rounded-full min-h-12 min-w-12'
+              className='rounded-full p-4'
               style={{ backgroundColor: colors[colorId].background }}>
             </span>
-            <span>{hours}h {minutes}m</span>
+            <span className='p-2'>{hours} hours {minutes} minutes</span>
           </div>
         );
       })}
