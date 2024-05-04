@@ -4,7 +4,6 @@
 // }
 
 const Legend = ({ data, colors }) => {
-  console.log({ data, colors })
   return (
     <div>
       {Object.keys(data).map((colorId) => {

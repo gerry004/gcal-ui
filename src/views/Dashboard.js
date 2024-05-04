@@ -1,10 +1,11 @@
 import api from '../constants/axios';
 import { useState, useEffect, useMemo } from 'react';
-import ColorGrid from '../components/ColorGrid';
+import Colors from '../components/Colors';
 import Calendars from '../components/Calendars';
 import Legend from '../components/Legend';
 import { FaArrowLeft } from 'react-icons/fa';
 import { FaArrowRight } from 'react-icons/fa';
+import { transformEventsToTimeSpentObject } from '../utils/events';
 
 const Dashboard = () => {
   const [colors, setColors] = useState({})
@@ -12,95 +13,79 @@ const Dashboard = () => {
   const [events, setEvents] = useState([])
 
   const getColors = async () => {
-    api.get('calendar/colors')
-      .then(res => { console.log(res.data); setColors(res.data.colors) })
-      .catch(err => console.error(err));
-  }
-  const fetchCalendarsAndEvents = async () => {
-    const response = await api.get('calendar/calendars');
-    const fetchedCalendars = response.data.calendars;
-    setCalendars(fetchedCalendars);
-
-    const colors = await api.get('calendar/colors');
-    const fetchedColors = colors.data.colors;
-    setColors(fetchedColors);
-
-    const getEvents = async () => {
-      api.get('calendar/events', { params: { startDate: '2024-05-01', endDate: '2024-05-04', calendars: fetchedCalendars, colors: fetchedColors } })
-        .then(res => { console.log(res.data); setEvents(res.data.events) })
-        .catch(err => console.error(err));
+    try {
+      const response = await api.get('calendar/colors');
+      return response.data.colors;
+    } catch (error) {
+      console.error('Error fetching colors:', error);
+      return [];
     }
-
-    getEvents();
-  }
-  const sortEventsByColor = (events) => {
-    const sortedEvents = {};
-    events.forEach(event => {
-      const color = event.colorId;
-      sortedEvents[color] = sortedEvents[color] || [];
-      sortedEvents[color].push(event);
-    });
-    return sortedEvents;
   };
 
-  const millisecondsToMinutes = (milliseconds) => {
-    if (typeof milliseconds !== 'number' || milliseconds < 0) {
-      throw new Error('Input must be a positive number representing milliseconds.');
+  const getCalendars = async () => {
+    try {
+      const response = await api.get('calendar/calendars');
+      return response.data.calendars;
+    } catch (error) {
+      console.error('Error fetching calendars:', error);
+      return [];
     }
-    const minutes = milliseconds / (1000 * 60);
-    return minutes;
-  }
+  };
 
-  const calculateTimeSpentByColor = (eventsByColor) => {
-    const timeSpentByColor = {};
-    Object.keys(eventsByColor).forEach(color => {
-      let timeSpentInMilliseconds = 0;
-      eventsByColor[color].forEach(event => {
-        const startDateTime = event.start.dateTime;
-        const endDateTime = event.end.dateTime;
-        const timeDifference = calculateTimeDifferenceInMilliseconds(startDateTime, endDateTime);
-        timeSpentInMilliseconds += timeDifference;
+  const getEvents = async (startDate, endDate, calendars, colors) => {
+    try {
+      const response = await api.get('calendar/events', {
+        params: { startDate, endDate, calendars, colors },
       });
-      const minutes = millisecondsToMinutes(timeSpentInMilliseconds);
-      timeSpentByColor[color] = minutes;
-    });
-    return timeSpentByColor;
-  }
-
-  const calculateTimeDifferenceInMilliseconds = (startDateTime, endDateTime) => {
-    const startDate = new Date(startDateTime);
-    const endDate = new Date(endDateTime);
-    const timeDifference = endDate - startDate;
-    if (isNaN(timeDifference)) {
-      return 0;
+      return response.data.events;
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      return [];
     }
-    return timeDifference;
-  }
+  };
 
+  const fetchData = async () => {
+    const [fetchedColors, fetchedCalendars] = await Promise.all([
+      getColors(),
+      getCalendars(),
+    ]);
 
-  const eventsByColor = sortEventsByColor(events);
-  const timeSpentByColor = calculateTimeSpentByColor(eventsByColor);
+    setColors(fetchedColors);
 
-  const minutesToHoursAndMinutes = (minutes) => {
-    if (typeof minutes !== 'number' || minutes < 0) {
-      throw new Error('Input must be a positive number representing minutes.');
-    }
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return { hours, minutes: remainingMinutes };
-  }
+    fetchedCalendars.forEach(cal => cal.checked = true);
+    setCalendars(fetchedCalendars);
 
-  Object.keys(timeSpentByColor).forEach((color) => {
-    const minutes = timeSpentByColor[color];
-    timeSpentByColor[color] = minutesToHoursAndMinutes(minutes);
-  });
+    const fetchedEvents = await getEvents(
+      '2024-05-01',
+      '2024-05-04',
+      fetchedCalendars,
+      fetchedColors
+    );
+    setEvents(fetchedEvents);
 
-  console.log(timeSpentByColor);
+    console.log({ fetchedColors, fetchedCalendars, fetchedEvents })
+  };
 
   useEffect(() => {
-    // getColors();
-    fetchCalendarsAndEvents();
+    fetchData();
   }, []);
+
+  const timeSpentByColor = useMemo(() => {
+    if (events) {
+      return transformEventsToTimeSpentObject(events);
+    }
+    return {};
+  }, [events]);
+
+  const updateCalendars = (calendarId, property, value) => {
+    const updatedCalendars = calendars.map(cal => {
+      if (cal.id === calendarId) {
+        return { ...cal, [property]: value };
+      }
+      return cal;
+    });
+    setCalendars(updatedCalendars);
+  }
 
   return (
     <>
@@ -115,14 +100,9 @@ const Dashboard = () => {
         <input type='date' />
         <input type='date' />
       </div>
-      {colors && (<ColorGrid className='flex gap-2' colors={colors} />)}
-      {calendars && (<Calendars className='flex flex-col' items={calendars} />)}
+      {colors && (<Colors className='flex gap-2' colors={colors} />)}
+      {calendars && (<Calendars className='flex flex-col' calendars={calendars} updateCalendars={updateCalendars} />)}
       {timeSpentByColor && (<Legend data={timeSpentByColor} colors={colors} />)}
-      {/* {events && events.map(event => (
-        <div key={event.id} className='p-2' style={{ backgroundColor: colors[event.colorId]?.background || colors[1].background }}>
-          {event.summary}
-        </div>
-      ))} */}
     </>
   );
 };

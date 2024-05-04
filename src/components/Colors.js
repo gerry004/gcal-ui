@@ -3,7 +3,7 @@
 // ...
 // }
 
-const ColorGrid = ({ className, colors }) => {
+const Colors = ({ className, colors }) => {
   return (
     <div className={className}>
       {colors && Object.entries(colors).map(([colorName, rgbValue]) => (
@@ -17,4 +17,4 @@ const ColorGrid = ({ className, colors }) => {
   )
 };
 
-export default ColorGrid;
+export default Colors;
