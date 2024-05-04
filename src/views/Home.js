@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import api from '../constants/axios';
 
 const Home = () => {
