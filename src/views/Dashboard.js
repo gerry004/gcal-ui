@@ -2,8 +2,9 @@ import api from '../constants/axios';
 
 const Dashboard = () => {
   const calendarClick = async () => {
-    const { data } = await api.post('calendar/events');
-    console.log(data)
+    api.post('calendar/events')
+      .then(res => { console.log(res.data) })
+      .catch(err => console.error(err));
   }
 
   return (

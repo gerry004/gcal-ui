@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { fetchAuthUrl } from '../utils/auth';
+import api from '../constants/axios';
 
 const Home = () => {
   const navigateTo = (url) => {
@@ -7,8 +7,9 @@ const Home = () => {
   }
   
   const handleSignInClick = async () => {
-    const url = await fetchAuthUrl();
-    navigateTo(url);
+    api.get('/request')
+      .then(res => { navigateTo(res.data.url) })
+      .catch(err => console.error(err));
   }
 
   return (
