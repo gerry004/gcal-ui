@@ -23,7 +23,7 @@ const Legend = ({ events, colors }) => {
           <div className='flex items-center gap-2' key={colorId}>
             <span
               className='rounded-full p-4'
-              style={{ backgroundColor: colors[colorId].background }}>
+              style={{ backgroundColor: colors[colorId]?.background }}>
             </span>
             <span className='p-2'>{hours} hours {minutes} minutes</span>
           </div>

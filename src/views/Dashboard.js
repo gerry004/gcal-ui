@@ -5,6 +5,29 @@ import Calendars from '../components/Calendars';
 import Legend from '../components/Legend';
 import Timeframe from '../components/Timeframe';
 import DatePicker from '../components/DatePicker';
+import Dexie from 'dexie';
+
+const dbName = 'MyDatabase';
+const dbVersion = 2;
+const initDatabase = async () => {
+  const db = new Dexie(dbName);
+
+  db.version(dbVersion).stores({
+    gCal: '++id, application',
+  });
+
+  const result = await db.gCal.where('application').equals('gCal').first();
+
+  if (!result) {
+    await db.gCal.put({ application: 'gCal', startDate: '2022-01-01', endDate: '2022-12-31', calendars: [{ id: 'Gerry Yang', defaultColorId: 2 }] });
+    const result = await db.gCal.where('application').equals('gCal').first();
+    console.log('initial', { result })
+  } else {
+    await db.gCal.update(result.id, { startDate: 'hell nah'});
+    const updatedResult = await db.gCal.where('application').equals('gCal').first();
+    console.log({ updatedResult })
+  }
+};
 
 const Dashboard = () => {
   const [colors, setColors] = useState({})
@@ -58,19 +81,20 @@ const Dashboard = () => {
     setCalendars(fetchedCalendars);
 
     const fetchedEvents = await getEvents(
-      '2024-05-01',
-      '2024-05-04',
+      startDate,
+      endDate,
       fetchedCalendars,
       fetchedColors
     );
     setEvents(fetchedEvents);
+    initDatabase();
 
     console.log({ fetchedColors, fetchedCalendars, fetchedEvents })
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [startDate, endDate]);
 
   const updateCalendars = (calendarId, property, value) => {
     const updatedCalendars = calendars.map(cal => {
@@ -98,6 +122,17 @@ const Dashboard = () => {
         {events && (<Legend events={events} colors={colors} />)}
       </div>
       {colors && (<Colors className='flex gap-2' colors={colors} />)}
+      {events.map((event) => (
+        <div key={event.id} className='border rounded-lg p-2 m-2'>
+          <div className='flex items-center gap-2'>
+            <span
+              className='rounded-full p-4'
+              style={{ backgroundColor: colors[event.colorId]?.background }}>
+            </span>
+            <span className='p-2'>{event.summary}</span>
+          </div>
+        </div>
+      ))}
     </>
   );
 };
