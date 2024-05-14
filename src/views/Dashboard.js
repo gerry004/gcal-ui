@@ -5,29 +5,7 @@ import Calendars from '../components/Calendars';
 import Legend from '../components/Legend';
 import Timeframe from '../components/Timeframe';
 import DatePicker from '../components/DatePicker';
-import Dexie from 'dexie';
-
-const dbName = 'MyDatabase';
-const dbVersion = 2;
-const initDatabase = async () => {
-  const db = new Dexie(dbName);
-
-  db.version(dbVersion).stores({
-    gCal: '++id, application',
-  });
-
-  const result = await db.gCal.where('application').equals('gCal').first();
-
-  if (!result) {
-    await db.gCal.put({ application: 'gCal', startDate: '2022-01-01', endDate: '2022-12-31', calendars: [{ id: 'Gerry Yang', defaultColorId: 2 }] });
-    const result = await db.gCal.where('application').equals('gCal').first();
-    console.log('initial', { result })
-  } else {
-    await db.gCal.update(result.id, { startDate: 'hell nah'});
-    const updatedResult = await db.gCal.where('application').equals('gCal').first();
-    console.log({ updatedResult })
-  }
-};
+import {initDatabase, getApplicationData, updateDatabase, getDatabaseFirstValue} from '../indexedDB/db';
 
 const Dashboard = () => {
   const [colors, setColors] = useState({})
@@ -92,9 +70,24 @@ const Dashboard = () => {
     console.log({ fetchedColors, fetchedCalendars, fetchedEvents })
   };
 
+  const fetchAppData = async () => {
+    const applicationData = await getApplicationData();
+    setStartDate(applicationData.startDate);
+    setEndDate(applicationData.endDate);
+  }
+  const initAppData = async () => {
+    await initDatabase();
+    await fetchAppData();
+    console.log('App data initialized');
+  }
+
+  useEffect(() => {
+    initAppData();
+  }, []);
+
   useEffect(() => {
     fetchData();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, calendars]);
 
   const updateCalendars = (calendarId, property, value) => {
     const updatedCalendars = calendars.map(cal => {
