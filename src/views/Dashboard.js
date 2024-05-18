@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Colors from '../components/Colors';
+import Events from '../components/Events';
 import Calendars from '../components/Calendars';
 import Legend from '../components/Legend';
 import { initDatabase, getAppData, updateAppData } from '../indexedDB/db';
@@ -43,7 +43,7 @@ const Dashboard = () => {
     };
 
     fetchEvents();
-    
+
   }, [startDate, endDate, appData]);
 
 
@@ -83,17 +83,9 @@ const Dashboard = () => {
           />
         )}
       </div>
-      {events.map((event) => (
-        <div key={event.id} className='border rounded-lg p-2 m-2'>
-          <div className='flex items-center gap-2'>
-            <span
-              className='rounded-full p-4'
-              style={{ backgroundColor: appData.colors[event.colorId]?.background }}>
-            </span>
-            <span className='p-2'>{event.summary}</span>
-          </div>
-        </div>
-      ))}
+      {events && (
+        <Events events={events} colors={appData.colors} />
+      )}
     </>
   );
 };

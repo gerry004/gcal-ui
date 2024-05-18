@@ -1,7 +1,7 @@
 
 import { millisecondsToMinutes, calculateTimeDifferenceInMilliseconds, minutesToHoursAndMinutes } from './time';
 
-const sortEventsByColor = (events) => {
+export const sortEventsByColor = (events) => {
   const sortedEvents = {};
   events.forEach(event => {
     const color = event.colorId;

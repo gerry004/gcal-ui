@@ -1,8 +1,3 @@
-// const data = {
-//   colorId, { hours, minutes },
-//   ...
-// }
-
 import { useMemo } from "react";
 import { transformEventsToTimeSpentObject } from "../utils/events";
 
