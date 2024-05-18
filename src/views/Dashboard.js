@@ -34,7 +34,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const events = await getEvents(startDate, endDate, appData.calendars, appData.colors);
+        const filteredCalendars = appData.calendars.filter(cal => cal.checked);
+        const events = await getEvents(startDate, endDate, filteredCalendars);
         setEvents(events)
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -57,9 +58,10 @@ const Dashboard = () => {
         setEndDate={setEndDate}
       />
       <div className='flex'>
-        {appData.calendars && (
+        {appData.calendars && appData.colors && (
           <Calendars
             calendars={appData.calendars}
+            colors={appData.colors}
             updateCalendars={(calendarId, key, value) => {
               const updatedState = {
                 ...appData,
@@ -81,12 +83,6 @@ const Dashboard = () => {
           />
         )}
       </div>
-      {appData.colors && (
-        <Colors
-          className='flex gap-2'
-          colors={appData.colors}
-        />
-      )}
       {events.map((event) => (
         <div key={event.id} className='border rounded-lg p-2 m-2'>
           <div className='flex items-center gap-2'>

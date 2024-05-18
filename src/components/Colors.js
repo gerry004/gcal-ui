@@ -1,17 +1,13 @@
-// colors = {
-// id: { background: #00000, foreground: #00000 },
-// ...
-// }
-
-const Colors = ({ className, colors }) => {
+const Colors = ({ className, colors, onClickColor }) => {
   return (
     <div className={className}>
-      {colors && Object.entries(colors).map(([colorName, rgbValue]) => (
-        <span
-          key={colorName}
+      {colors && Object.entries(colors).map(([colorId, rgbValue]) => (
+        <button
+          key={colorId}
           className='min-w-6 min-h-6 rounded-full'
           style={{backgroundColor: rgbValue.background}}
-        ></span>
+          onClick={() => onClickColor(colorId)}
+        ></button>
       ))}
     </div>
   )
