@@ -9,16 +9,20 @@ const Events = ({ colors, events }) => {
     <>
       <div className='border border-black rounded-lg p-2 m-2 flex gap-2 justify-start items-center'>
         <button
-          className='min-w-6 min-h-6 rounded-full border-black border'
+          className='min-w-6 min-h-6 rounded-full border-black border p-2'
           onClick={() => setActiveTab('All')}
-        />
+        >
+          All
+        </button>
         {Object.keys(sortedEventsByColor).map((id) => (
-            <button
-              key={id}
-              className='min-w-6 min-h-6 rounded-full border-black border'
-              onClick={() => setActiveTab(id)}
-              style={{ backgroundColor: colors[id]?.background }}
-            />
+          <button
+            key={id}
+            className='min-w-6 min-h-6 rounded-full border-black border p-2'
+            onClick={() => setActiveTab(id)}
+            style={{ backgroundColor: colors[id]?.background }}
+          >
+            {colors[id]?.label}
+          </button>
         ))}
       </div>
       <div>

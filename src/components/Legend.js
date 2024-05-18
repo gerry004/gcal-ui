@@ -1,7 +1,30 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { transformEventsToTimeSpentObject } from "../utils/events";
+import TextInput from "./TextInput";
 
-const Legend = ({ events, colors }) => {
+const Legend = ({ events, colors, updateColors }) => {
+  const [labelValues, setLabelValues] = useState({});
+
+  useEffect(() => {
+    const labelValues = {};
+
+    if (colors) {
+      Object.keys(colors).forEach((colorId) => {
+        if (colors[colorId].label) {
+          labelValues[colorId] = colors[colorId].label;
+        }
+      });
+    }
+
+    setLabelValues(labelValues);
+  }, [colors]);
+
+  const handleChange = (colorId, value) => {
+    setLabelValues({
+      ...labelValues,
+      [colorId]: value,
+    });
+  };
 
   const timeSpentByColor = useMemo(() => {
     if (events) {
@@ -16,10 +39,13 @@ const Legend = ({ events, colors }) => {
         const { hours, minutes } = timeSpentByColor[colorId];
         return (
           <div className='flex items-center gap-2' key={colorId}>
-            <span
-              className='rounded-full p-4'
-              style={{ backgroundColor: colors[colorId]?.background }}>
-            </span>
+            <TextInput
+              value={labelValues[colorId] || ''}
+              onChange={(value) => handleChange(colorId, value)}
+              onBlur={() => updateColors(colorId, 'label', labelValues[colorId])}
+              backgroundColor={colors[colorId]?.background}
+            >
+            </TextInput>
             <span className='p-2'>{hours} hours {minutes} minutes</span>
           </div>
         );

@@ -46,6 +46,33 @@ const Dashboard = () => {
 
   }, [startDate, endDate, appData]);
 
+  const updateColors = (colorId, key, value) => {
+    const updatedState = {
+      ...appData,
+      colors: {
+        ...appData.colors,
+        [colorId]: {
+          ...appData.colors[colorId],
+          [key]: value
+        }
+      }
+    };
+    setAppData(updatedState);
+  }
+
+  const updateCalenadar = (calendarId, key, value) => {
+    const updatedState = {
+      ...appData,
+      calendars: appData.calendars.map(cal => {
+        if (cal.id === calendarId) {
+          return { ...cal, [key]: value };
+        }
+        return cal;
+      })
+    };
+    setAppData(updatedState);
+  }
+
 
   return (
     <>
@@ -62,24 +89,14 @@ const Dashboard = () => {
           <Calendars
             calendars={appData.calendars}
             colors={appData.colors}
-            updateCalendars={(calendarId, key, value) => {
-              const updatedState = {
-                ...appData,
-                calendars: appData.calendars.map(cal => {
-                  if (cal.id === calendarId) {
-                    return { ...cal, [key]: value };
-                  }
-                  return cal;
-                })
-              };
-              setAppData(updatedState);
-            }}
+            updateCalendars={updateCalenadar}
           />
         )}
         {events && (
           <Legend
             events={events}
             colors={appData.colors}
+            updateColors={updateColors}
           />
         )}
       </div>
