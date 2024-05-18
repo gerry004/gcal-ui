@@ -1,4 +1,5 @@
 import Dexie from 'dexie';
+import { getCalendars, getColors } from '../utils/api';
 
 const dbName = 'gCal Database';
 const dbVersion = 1;
@@ -7,19 +8,34 @@ db.version(dbVersion).stores({
   gCal: '++id, application',
 });
 
-const defaultApplicationData = {
-  application: 'gCal',
-  startDate: '2024-01-01',
-  endDate: '2024-01-31',
-  calendars: [{ id: 'Gerry Yang', defaultColorId: 2 }]
-};
+const setupAppData = async () => {
+  const appData = {
+    application: 'gCal',
+    calendars: [],
+    colors: {},
+  }
+
+  const calendars = await getCalendars();
+  calendars.forEach(cal => {
+    if (cal.primary) {
+      appData.calendars.push({ ...cal, defaultEventColor: '1', checked: cal.selected });
+    } else {
+      appData.calendars.push({ ...cal, defaultEventColor: null, checked: cal.selected });
+    }
+  });
+
+  const colors = await getColors();
+  appData.colors = colors;
+
+  return await db.gCal.put(appData);
+}
 
 export const initDatabase = async () => {
   try {
-    const result = await db.gCal.where('application').equals('gCal').first();
+    const result = await getAppData();
 
     if (!result) {
-      await db.gCal.put(defaultApplicationData);
+      await setupAppData();
     }
 
     console.log('Database initialized');
@@ -28,14 +44,13 @@ export const initDatabase = async () => {
   }
 };
 
-export const getApplicationData = async () => {
-  const applicationData = await db.gCal.where('application').equals('gCal').first();
-  return applicationData;
+export const getAppData = async () => {
+  const appData = await db.gCal.where('application').equals('gCal').first();
+  return appData;
 }
 
-export const updateDatabase = async (key, value) => {
-  const applicationData = getApplicationData();
-  await db.gCal.update(applicationData.id, { [key]: value });
+export const updateAppData = async (newAppData) => {
+  await db.gCal.put(newAppData);
 }
 
 export const getDatabaseFirstValue = async (where, value) => {

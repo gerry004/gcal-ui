@@ -1,126 +1,98 @@
-import api from '../constants/axios';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Colors from '../components/Colors';
 import Calendars from '../components/Calendars';
 import Legend from '../components/Legend';
-import Timeframe from '../components/Timeframe';
-import DatePicker from '../components/DatePicker';
-import {initDatabase, getApplicationData, updateDatabase, getDatabaseFirstValue} from '../indexedDB/db';
+import { initDatabase, getAppData, updateAppData } from '../indexedDB/db';
+import Dates from '../components/Dates';
+import { getEvents } from '../utils/api';
 
 const Dashboard = () => {
-  const [colors, setColors] = useState({})
-  const [calendars, setCalendars] = useState([])
-  const [events, setEvents] = useState([])
+  const [appData, setAppData] = useState({});
   const [timeframe, setTimeframe] = useState('Week');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [events, setEvents] = useState([]);
 
-  const getColors = async () => {
-    try {
-      const response = await api.get('calendar/colors');
-      return response.data.colors;
-    } catch (error) {
-      console.error('Error fetching colors:', error);
-      return [];
-    }
-  };
-
-  const getCalendars = async () => {
-    try {
-      const response = await api.get('calendar/calendars');
-      return response.data.calendars;
-    } catch (error) {
-      console.error('Error fetching calendars:', error);
-      return [];
-    }
-  };
-
-  const getEvents = async (startDate, endDate, calendars, colors) => {
-    try {
-      const response = await api.get('calendar/events', {
-        params: { startDate, endDate, calendars, colors },
-      });
-      return response.data.events;
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      return [];
-    }
-  };
-
-  const fetchData = async () => {
-    const [fetchedColors, fetchedCalendars] = await Promise.all([
-      getColors(),
-      getCalendars(),
-    ]);
-
-    setColors(fetchedColors);
-
-    fetchedCalendars.forEach(cal => cal.checked = true);
-    setCalendars(fetchedCalendars);
-
-    const fetchedEvents = await getEvents(
-      startDate,
-      endDate,
-      fetchedCalendars,
-      fetchedColors
-    );
-    setEvents(fetchedEvents);
-    initDatabase();
-
-    console.log({ fetchedColors, fetchedCalendars, fetchedEvents })
-  };
-
-  const fetchAppData = async () => {
-    const applicationData = await getApplicationData();
-    setStartDate(applicationData.startDate);
-    setEndDate(applicationData.endDate);
-  }
-  const initAppData = async () => {
+  const initApplication = async () => {
     await initDatabase();
-    await fetchAppData();
+
+    const appData = await getAppData();
+    setAppData(appData);
+
     console.log('App data initialized');
+    console.log(appData);
   }
 
   useEffect(() => {
-    initAppData();
+    initApplication();
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [startDate, endDate, calendars]);
+    updateAppData(appData);
+  }, [appData]);
 
-  const updateCalendars = (calendarId, property, value) => {
-    const updatedCalendars = calendars.map(cal => {
-      if (cal.id === calendarId) {
-        return { ...cal, [property]: value };
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const events = await getEvents(startDate, endDate, appData.calendars, appData.colors);
+        setEvents(events)
+      } catch (error) {
+        console.error('Error fetching events:', error);
       }
-      return cal;
-    });
-    setCalendars(updatedCalendars);
-  }
+    };
+
+    fetchEvents();
+    
+  }, [startDate, endDate, appData]);
+
 
   return (
     <>
-      <div className='flex justify-between items-center p-2 m-2'>
-        <div className='flex gap-2'>
-          <DatePicker id='start-date' label='Start Date' date={startDate} setDate={setStartDate} />
-          <DatePicker id='end-date' label='End Date' date={endDate} setDate={setEndDate} />
-        </div>
-        <div className='flex m-1 rounded-full items-center'>
-          <Timeframe timeframe={timeframe} setTimeframe={setTimeframe} />
-        </div>
-      </div>
+      <Dates
+        startDate={startDate}
+        endDate={endDate}
+        timeframe={timeframe}
+        setTimeframe={setTimeframe}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
+      />
       <div className='flex'>
-        {calendars && (<Calendars calendars={calendars} updateCalendars={updateCalendars} />)}
-        {events && (<Legend events={events} colors={colors} />)}
+        {appData.calendars && (
+          <Calendars
+            calendars={appData.calendars}
+            updateCalendars={(calendarId, key, value) => {
+              const updatedState = {
+                ...appData,
+                calendars: appData.calendars.map(cal => {
+                  if (cal.id === calendarId) {
+                    return { ...cal, [key]: value };
+                  }
+                  return cal;
+                })
+              };
+              setAppData(updatedState);
+            }}
+          />
+        )}
+        {events && (
+          <Legend
+            events={events}
+            colors={appData.colors}
+          />
+        )}
       </div>
-      {colors && (<Colors className='flex gap-2' colors={colors} />)}
+      {appData.colors && (
+        <Colors
+          className='flex gap-2'
+          colors={appData.colors}
+        />
+      )}
       {events.map((event) => (
         <div key={event.id} className='border rounded-lg p-2 m-2'>
           <div className='flex items-center gap-2'>
             <span
               className='rounded-full p-4'
-              style={{ backgroundColor: colors[event.colorId]?.background }}>
+              style={{ backgroundColor: appData.colors[event.colorId]?.background }}>
             </span>
             <span className='p-2'>{event.summary}</span>
           </div>

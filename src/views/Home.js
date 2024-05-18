@@ -12,7 +12,7 @@ const Home = () => {
   }
 
   return (
-    <div>
+    <div className='w-full h-screen flex flex-col justify-center items-center'>
       <h1>Google Calendar Calculate Time App</h1>
       <button className='bg-blue-400 text-white hover:bg-blue-600 p-2' onClick={handleSignInClick}>Sign In</button>
     </div>
