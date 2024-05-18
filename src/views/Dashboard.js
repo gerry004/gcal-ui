@@ -5,6 +5,7 @@ import Legend from '../components/Legend';
 import { initDatabase, getAppData, updateAppData } from '../indexedDB/db';
 import Dates from '../components/Dates';
 import { getEvents } from '../utils/api';
+import PieChart from '../components/PieChart';
 
 const Dashboard = () => {
   const [appData, setAppData] = useState({});
@@ -91,6 +92,9 @@ const Dashboard = () => {
             colors={appData.colors}
             updateCalendars={updateCalenadar}
           />
+        )}
+        {events && (
+          <PieChart events={events} colors={appData.colors} />
         )}
         {events && (
           <Legend

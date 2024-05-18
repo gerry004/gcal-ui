@@ -36,7 +36,6 @@ const Legend = ({ events, colors, updateColors }) => {
   return (
     <div className='border rounded-lg inline-flex border-black flex-col p-2'>
       {Object.keys(timeSpentByColor).map((colorId) => {
-        const { hours, minutes } = timeSpentByColor[colorId];
         return (
           <div className='flex items-center gap-2' key={colorId}>
             <TextInput
@@ -46,7 +45,7 @@ const Legend = ({ events, colors, updateColors }) => {
               backgroundColor={colors[colorId]?.background}
             >
             </TextInput>
-            <span className='p-2'>{hours} hours {minutes} minutes</span>
+            <span className='p-2'>{timeSpentByColor[colorId]} hours</span>
           </div>
         );
       })}

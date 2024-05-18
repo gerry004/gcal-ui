@@ -1,5 +1,5 @@
 
-import { millisecondsToMinutes, calculateTimeDifferenceInMilliseconds, minutesToHoursAndMinutes } from './time';
+import { millisecondsToMinutes, calculateTimeDifferenceInMilliseconds, minutesToHours } from './time';
 
 export const sortEventsByColor = (events) => {
   const sortedEvents = {};
@@ -33,7 +33,7 @@ export const transformEventsToTimeSpentObject = (events) => {
 
   Object.keys(timeSpentByColor).forEach((color) => {
     const minutes = timeSpentByColor[color];
-    timeSpentByColor[color] = minutesToHoursAndMinutes(minutes);
+    timeSpentByColor[color] = minutesToHours(minutes);
   });
 
   return timeSpentByColor;
