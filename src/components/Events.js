@@ -22,7 +22,7 @@ const Events = ({ colors, events }) => {
             onClick={() => setActiveTab(id)}
             style={{ backgroundColor: colors[id]?.background }}
           >
-            {colors[id]?.label}
+            {colors[id]?.label || id}
           </button>
         ))}
       </div>

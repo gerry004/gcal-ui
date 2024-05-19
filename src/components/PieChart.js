@@ -15,7 +15,7 @@ const PieChart = ({ events, colors }) => {
   }, [events]);
 
   const transformTimeSpentByColorToPieChartData = (timeSpentByColor) => {
-    const labels = Object.keys(timeSpentByColor).map((colorId) => colors[colorId]?.label);
+    const labels = Object.keys(timeSpentByColor).map((colorId) => { return colors[colorId]?.label || colorId });
     const data = Object.values(timeSpentByColor);
     const backgroundColor = Object.keys(timeSpentByColor).map((color) => colors[color]?.background);
     const borderWidth = 1;
