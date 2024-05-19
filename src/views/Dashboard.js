@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import Events from '../components/Events';
 import Calendars from '../components/Calendars';
-import Legend from '../components/Legend';
+import Colors from '../components/Colors';
 import { initDatabase, getAppData, updateAppData } from '../indexedDB/db';
 import Dates from '../components/Dates';
 import { getEvents } from '../utils/api';
 import PieChart from '../components/PieChart';
+import Sidebar from '../components/Sidebar';
+import Content from '../components/Content';
 
 const Dashboard = () => {
   const [appData, setAppData] = useState({});
-  const [timeframe, setTimeframe] = useState('Week');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [events, setEvents] = useState([]);
@@ -61,7 +62,7 @@ const Dashboard = () => {
     setAppData(updatedState);
   }
 
-  const updateCalenadar = (calendarId, key, value) => {
+  const updateCalendars = (calendarId, key, value) => {
     const updatedState = {
       ...appData,
       calendars: appData.calendars.map(cal => {
@@ -74,39 +75,26 @@ const Dashboard = () => {
     setAppData(updatedState);
   }
 
-
   return (
     <>
-      <Dates
-        startDate={startDate}
-        endDate={endDate}
-        timeframe={timeframe}
-        setTimeframe={setTimeframe}
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
-      />
       <div className='flex'>
         {appData.calendars && appData.colors && (
-          <Calendars
+          <Sidebar
             calendars={appData.calendars}
             colors={appData.colors}
-            updateCalendars={updateCalenadar}
-          />
-        )}
-        {events && (
-          <PieChart events={events} colors={appData.colors} />
-        )}
-        {events && (
-          <Legend
-            events={events}
-            colors={appData.colors}
+            updateCalendars={updateCalendars}
             updateColors={updateColors}
           />
         )}
+        <Content
+          events={events}
+          colors={appData.colors}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
       </div>
-      {events && (
-        <Events events={events} colors={appData.colors} />
-      )}
     </>
   );
 };

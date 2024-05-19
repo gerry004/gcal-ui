@@ -31,16 +31,38 @@ const PieChart = ({ events, colors }) => {
         },
       ],
     };
-    console.log('Pie chart data:', pieChartData)
+
     return pieChartData;
   }
 
   const data = useMemo(() => transformTimeSpentByColorToPieChartData(timeSpentByColor), [timeSpentByColor]);
 
+  const options = {
+    responsive: false,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          generateLabels: (chart) => {
+            const data = chart.data;
+            return data.labels.map((label, i) => {
+              const value = data.datasets[0].data[i];
+              const backgroundColor = data.datasets[0].backgroundColor[i];
+              return {
+                text: `${label} - ${value} hours`,
+                fillStyle: backgroundColor,
+                index: i,
+              };
+            })
+          },
+        }
+      },
+    },
+  };
+
   return (
-    <div className=''>
-    <Pie data={data} />
-    </div>
+    <Pie data={data} options={options} width={500} height={500} />
   );
 }
 
