@@ -12,12 +12,18 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   (error) => {
     const status = error.response?.status;
     const message = error.response?.data?.message || error.message;
 
-    console.log('Error:', status, message);
+    if (status === 401) {
+      console.log('Unauthorized. Redirecting to home page...');
+      window.location.href = 'http://localhost:8080'
+    } else {
+      console.log('Error:', status, message);
+    }
+
     return Promise.reject(error)
   }
 );
