@@ -26,7 +26,7 @@ const Events = ({ colors, events }) => {
         ))}
       </div>
       <div>
-        {activeTab === 'All' && events.map((event) => (
+        {activeTab === 'All' && events && events.map((event) => (
           <div key={event.id} className='border rounded-lg p-2 m-2'>
             <div className='flex items-center gap-2'>
               <span
