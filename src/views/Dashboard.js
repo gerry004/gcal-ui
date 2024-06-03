@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
-import Events from '../components/Events';
-import Calendars from '../components/Calendars';
-import Colors from '../components/Colors';
 import { initDatabase, getAppData, updateAppData } from '../indexedDB/db';
-import Dates from '../components/Dates';
 import { getEvents } from '../utils/api';
-import PieChart from '../components/PieChart';
 import Sidebar from '../components/Sidebar';
 import Content from '../components/Content';
 

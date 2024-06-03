@@ -1,10 +1,11 @@
 import Timeframe from "./Timeframe"
-import DatePicker from "./DatePicker"
+import DatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
 import {
   formatDate,
-  startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
-  getLastWeekStart, getLastWeekEnd, getNextWeekStart, getNextWeekEnd, 
-  getLastMonthStart, getLastMonthEnd,getNextMonthStart, getNextMonthEnd, 
+  startOfMonth, endOfMonth, startOfWeek, endOfWeek,
+  getLastWeekStart, getLastWeekEnd, getNextWeekStart, getNextWeekEnd,
+  getLastMonthStart, getLastMonthEnd, getNextMonthStart, getNextMonthEnd,
   yesterday, tomorrow
 } from '../utils/relativeTime';
 import { useEffect } from "react";
@@ -76,8 +77,22 @@ const Dates = ({
   return (
     <div className='flex justify-between items-center p-2 m-2'>
       <div className='flex gap-2'>
-        <DatePicker id='start-date' label='Start Date' date={startDate} setDate={setStartDate} />
-        <DatePicker id='end-date' label='End Date' date={endDate} setDate={setEndDate} />
+        <div className='flex flex-col'>
+        <span className='p-1 text-sm text-gray-600 font-semibold'>Start Date:</span>
+          <DatePicker
+            selected={startDate}
+            className="border border-gray-300 p-2 rounded"
+            onChange={(date) => setStartDate(date.toISOString().split('T')[0])}
+            dateFormat="dd MMM yyyy" />
+        </div>
+        <div className='flex flex-col'>
+          <span className='p-1 text-sm text-gray-600 font-semibold'>End Date:</span>
+          <DatePicker
+            selected={endDate}
+            className="border border-gray-300 p-2 rounded"
+            onChange={(date) => setEndDate(date.toISOString().split('T')[0])}
+            dateFormat="dd MMM yyyy" />
+        </div>
       </div>
       <div className='flex m-1 rounded-full items-center'>
         <Timeframe timeframe={timeframe} setTimeframe={setTimeframe} previous={previous} next={next} />
