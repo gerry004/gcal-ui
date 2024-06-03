@@ -44,7 +44,9 @@ const Dashboard = () => {
       }
     };
 
-    fetchEvents();
+    if (startDate && endDate && appData.calendars) {
+      fetchEvents();
+    }
 
   }, [startDate, endDate, appData]);
 
