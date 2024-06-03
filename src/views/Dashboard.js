@@ -3,12 +3,14 @@ import { initDatabase, getAppData, updateAppData } from '../indexedDB/db';
 import { getEvents } from '../utils/api';
 import Sidebar from '../components/Sidebar';
 import Content from '../components/Content';
+import { getNextMonthEnd, getNextMonthStart } from '../utils/relativeTime';
 
 const Dashboard = () => {
   const [appData, setAppData] = useState({});
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [events, setEvents] = useState([]);
+  const [lineEvents, setLineEvents] = useState([]);
 
   const initApplication = async () => {
     await initDatabase();
@@ -43,7 +45,43 @@ const Dashboard = () => {
       fetchEvents();
     }
 
-  }, [startDate, endDate, appData]);
+  }, [startDate, endDate, appData.calendars]);
+
+  useEffect(() => {
+    const today = new Date();
+    let startMonthDate = '2023-01-01';
+    let endMonthDate = '2023-01-31';
+    const fetchEventsByMonth = async () => {
+      try {
+        const filteredCalendars = appData.calendars.filter(cal => cal.checked);
+        while (today > new Date(startMonthDate)) {
+          const events = await getEvents(startMonthDate, endMonthDate, filteredCalendars);
+          updateEvents(startMonthDate, events)
+          startMonthDate = getNextMonthStart(startMonthDate);
+          endMonthDate = getNextMonthEnd(startMonthDate);
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    if (appData.calendars) {
+      fetchEventsByMonth();
+    }
+  }, [appData.calendars]);
+
+  const updateEvents = (startMonthDate, events) => {
+    setAppData((prevState) => {
+      const updatedState = {
+        ...prevState,
+        events: {
+          ...prevState.events,
+          [startMonthDate]: events,
+        },
+      };
+      return updatedState;
+    });
+  };
 
   const updateColors = (colorId, key, value) => {
     const updatedState = {
@@ -85,6 +123,7 @@ const Dashboard = () => {
         )}
         <Content
           events={events}
+          lineEvents={appData.events}
           colors={appData.colors}
           startDate={startDate}
           setStartDate={setStartDate}

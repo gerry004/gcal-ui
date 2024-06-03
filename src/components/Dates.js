@@ -51,6 +51,7 @@ const Dates = ({
       case 'Day':
         setStartDate(yesterday(startDate));
         setEndDate(yesterday(endDate));
+        break;
       default:
         break;
     }
@@ -69,13 +70,14 @@ const Dates = ({
       case 'Day':
         setStartDate(tomorrow(startDate));
         setEndDate(tomorrow(endDate));
+        break;
       default:
         break;
     }
   }
 
   return (
-    <div className='flex justify-between items-center p-2 m-2'>
+    <div className='flex justify-between items-center py-2 m-2'>
       <div className='flex gap-2'>
         <div className='flex flex-col'>
         <span className='p-1 text-sm text-gray-600 font-semibold'>Start Date:</span>
