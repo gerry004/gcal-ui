@@ -46,15 +46,22 @@ const PieChart = ({ events, colors }) => {
         labels: {
           generateLabels: (chart) => {
             const data = chart.data;
-            return data.labels.map((label, i) => {
+            const totalTimeSpent = data.datasets[0].data.reduce((acc, value) => acc + value, 0);
+            const totalLabel = {
+              text: `Total Time Spent: ${totalTimeSpent} hours`,
+              fillStyle: 'transparent',
+            };
+            const colorLabels = data.labels.map((label, i) => {
               const value = data.datasets[0].data[i];
               const backgroundColor = data.datasets[0].backgroundColor[i];
+              const percentage = ((value / totalTimeSpent) * 100).toFixed(2);
               return {
-                text: `${label} - ${value} hours`,
+                text: `${label} - ${value} hours (${percentage}%)`,
                 fillStyle: backgroundColor,
                 index: i,
               };
-            })
+            });
+            return [totalLabel, ...colorLabels];
           },
         }
       },

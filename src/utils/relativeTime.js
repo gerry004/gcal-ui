@@ -70,7 +70,7 @@ export const getNextWeekStart = (dateString) => {
 
 export const getNextWeekEnd = (dateString) => {
   const givenDate = new Date(dateString);
-  const nextWeekStartDate = getNextWeekStart(dateString);
+  const nextWeekStartDate = getNextWeekStart(givenDate);
   const nextWeekEndDate = addDays(new Date(nextWeekStartDate), 6);
   return formatDate(nextWeekEndDate);
 }

@@ -11,6 +11,12 @@ export const sortEventsByColor = (events) => {
   return sortedEvents;
 };
 
+export const calculateEventDurationInHours = (event) => {
+  const startDateTime = new Date(event.start.dateTime);
+  const endDateTime = new Date(event.end.dateTime);
+  return ((endDateTime - startDateTime) / 1000 / 60 / 60 || 0);
+}
+
 const calculateTimeSpentByColor = (eventsByColor) => {
   const timeSpentByColor = {};
   Object.keys(eventsByColor).forEach(color => {
