@@ -1,23 +1,30 @@
-import api from '../constants/axios';
-import Navbar from '../components/Navbar';
+import Navbar from "../components/Navbar";
+import api from "../constants/axios";
 
 const Home = () => {
-  const navigateTo = (url) => {
-    window.location.href = url;
-  }
-
-  const handleSignInClick = async () => {
-    api.get('/request')
-      .then(res => { navigateTo(res.data.url) })
-      .catch(err => console.error(err));
-  }
+  const checkAuth = async () => {
+    api
+      .get("/isAuthenticated")
+      .then((res) => {
+        alert(res.data.isAuthenticated);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   return (
     <>
       <Navbar />
-      <div className='w-full h-screen flex flex-col justify-center items-center'>
-        <h1>Google Calendar Calculate Time App</h1>
-        <button className='bg-blue-400 text-white hover:bg-blue-600 p-2' onClick={handleSignInClick}>Sign In</button>
+      <div className="w-full h-screen flex flex-col justify-center items-center">
+        <h1>Welcome to Calendar Wrapped</h1>
+        <p>A simple Google Calendar wrapper</p>
+        <button
+          className="bg-white text-primary font-semibold p-2 rounded-lg hover:text-secondary"
+          onClick={checkAuth}
+        >
+          Check Auth
+        </button>
       </div>
     </>
   );
