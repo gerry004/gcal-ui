@@ -19,7 +19,7 @@ api.interceptors.response.use(
 
     if (status === 401) {
       console.log('Unauthorized. Redirecting to home page...');
-      window.location.href = 'http://localhost:8080'
+      // window.location.href = 'http://localhost:8080'
     } else {
       console.log('Error:', status, message);
     }

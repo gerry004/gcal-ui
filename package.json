@@ -15,6 +15,7 @@
     "dexie": "^4.0.4",
     "googleapis": "^135.1.0",
     "https": "^1.0.0",
+    "openai": "^4.78.1",
     "postcss": "^8.4.38",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
