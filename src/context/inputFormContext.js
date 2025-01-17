@@ -10,7 +10,6 @@ export const InputFormProvider = ({ children }) => {
   const [calendar, setCalendar] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const navigate = useNavigate();
 
   const generateCalendarWrapped = async (calendar) => {
@@ -18,7 +17,8 @@ export const InputFormProvider = ({ children }) => {
     setError(null);
     try {
       const result = await getSummary(calendar, startDate, endDate);
-      console.log(result);
+      const parsedResult = JSON.parse(result);
+      console.log(parsedResult);
       navigate("/wrapped");
     } catch (err) {
       console.error("Error generating calendar:", err);

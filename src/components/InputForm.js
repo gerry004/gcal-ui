@@ -29,7 +29,7 @@ const InputForm = () => {
     const validateForm = () => {
       const isCalendarSelected = !!calendar;
       const areDatesValid =
-        startDate && endDate && new Date(startDate) < new Date(endDate);
+        startDate && endDate && new Date(startDate) <= new Date(endDate);
       setIsFormValid(isCalendarSelected && areDatesValid);
     };
 
